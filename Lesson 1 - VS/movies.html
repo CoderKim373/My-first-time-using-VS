@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sonic Movies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffeb3b 0%, #ff9800 25%, #2196f3 50%, #9c27b0 75%, #4caf50 100%);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        nav {
+            width: 100%;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800, #2196f3);
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .nav-title {
+            color: #fff;
+            font-size: 1.5em;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu li {
+            margin: 0 10px;
+        }
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-menu a:hover {
+            color: #ffeb3b;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 80px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #ffeb3b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+            to { text-shadow: 2px 2px 20px #ffeb3b, 2px 2px 4px rgba(0,0,0,0.3); }
+        }
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .movie-card {
+            background: linear-gradient(145deg, #ffffff, #f0f8ff);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .movie-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        .movie-card:hover::before {
+            left: 100%;
+        }
+        .movie-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            border-color: #ffeb3b;
+        }
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        .movie-poster:hover {
+            transform: scale(1.05);
+        }
+        .movie-title {
+            color: #2196f3;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .movie-year {
+            background: linear-gradient(45deg, #ffeb3b, #ff9800);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .movie-description {
+            line-height: 1.6;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .movie-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .stars {
+            color: #ffeb3b;
+            font-size: 1.5em;
+        }
+        .rating-text {
+            font-weight: bold;
+            color: #ff9800;
+        }
+        .movie-highlights {
+            background: rgba(255, 235, 59, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffeb3b;
+        }
+        .movie-highlights h4 {
+            color: #2196f3;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .movie-highlights ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .movie-highlights li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+        .movie-highlights li::before {
+            content: '🎬';
+            position: absolute;
+            left: 0;
+        }
+        footer {
+            text-align: center;
+            font-size: 1em;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @media (max-width: 768px) {
+            .movies-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <h1 class="nav-title">The Sonic Team</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="sonic.html">Sonic</a></li>
+                <li><a href="tails.html">Tails</a></li>
+                <li><a href="knuckles.html">Knuckles</a></li>
+                <li><a href="shadow.html">Shadow</a></li>
+                <li><a href="movies.html">Sonic Movies</a></li>
+                <li><a href="index.html#comments">Comments</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>🎬 Sonic Movies 🎬</h1>
+        
+        <div class="movies-grid">
+            <div class="movie-card">
+                <img src="https://m.media-amazon.com/images/M/MV5BMDk5Yzc4NzMtODUwOS00NTdhLTgxMTctNjk2NDcyYjg1MDA1XkEyXkFqcGdeQXVyMTA3MDk2NDg2._V1_.jpg" alt="Sonic the Hedgehog (2020)" class="movie-poster">
+                <h2 class="movie-title">Sonic the Hedgehog</h2>
+                <span class="movie-year">2020</span>
+                <div class="movie-rating">
+                    <span class="stars">⭐⭐⭐⭐</span>
+                    <span class="rating-text">7.5/10</span>
+                </div>
+                <p class="movie-description">
+                    The world needed a hero, and they got a hedgehog! Powered with incredible speed, Sonic embraces his new home on Earth. That is, until he accidentally knocks out the power grid and sparks the attention of super-uncool evil scientist Dr. Robotnik.
+                </p>
+                <div class="movie-highlights">
+                    <h4>Movie Highlights:</h4>
+                    <ul>
+                        <li>Jim Carrey as Dr. Robotnik</li>
+                        <li>Sonic's first live-action adventure</li>
+                        <li>Box office success worldwide</li>
+                        <li>Heartwarming friendship story</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://m.media-amazon.com/images/M/MV5BM2M1NjQ2YmQtNzZhZC00MzJmLWI2NzYtZTk4MzQyMzI0OGZmXkEyXkFqcGdeQXVyMTA3MDk2NDg2._V1_.jpg" alt="Sonic the Hedgehog 2 (2022)" class="movie-poster">
+                <h2 class="movie-title">Sonic the Hedgehog 2</h2>
+                <span class="movie-year">2022</span>
+                <div class="movie-rating">
+                    <span class="stars">⭐⭐⭐⭐⭐</span>
+                    <span class="rating-text">8.2/10</span>
+                </div>
+                <p class="movie-description">
+                    After settling in Green Hills, Sonic is eager to prove he has what it takes to be a true hero. His test comes when Dr. Robotnik returns, this time with a new partner, Knuckles, in search for an emerald that has the power to destroy civilizations.
+                </p>
+                <div class="movie-highlights">
+                    <h4>Movie Highlights:</h4>
+                    <ul>
+                        <li>Introduction of Tails and Knuckles</li>
+                        <li>Epic Master Emerald storyline</li>
+                        <li>Improved CGI and action sequences</li>
+                        <li>Team Sonic formation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://m.media-amazon.com/images/M/MV5BNzU1Nzk4MDQtOWY5Ny00NzY0LWJiM2MtZGY2ZmQ5NzFjNzE5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg" alt="Sonic the Hedgehog 3 (2024)" class="movie-poster">
+                <h2 class="movie-title">Sonic the Hedgehog 3</h2>
+                <span class="movie-year">2024 - Newly Released! 🎉</span>
+                <div class="movie-rating">
+                    <span class="stars">⭐⭐⭐⭐⭐</span>
+                    <span class="rating-text">9.1/10</span>
+                </div>
+                <p class="movie-description">
+                    Sonic, Knuckles, and Tails reunite against a powerful new adversary, Shadow, a mysterious villain with powers unlike anything they have faced before. With their abilities outmatched in every way, Team Sonic must seek out an unlikely alliance.
+                </p>
+                <div class="movie-highlights">
+                    <h4>Movie Highlights:</h4>
+                    <ul>
+                        <li>Shadow the Hedgehog's epic movie debut</li>
+                        <li>Keanu Reeves voices Shadow perfectly</li>
+                        <li>Most epic Sonic adventure yet</li>
+                        <li>Breaking box office records!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="movie-card">
+                <img src="https://m.media-amazon.com/images/M/MV5BYjExYTcwNzEtMDVjNS00NzVhLWI2YzYtNWVmMDI5MzQzMjE4XkEyXkFqcGdeQXVyMTEzMTI1Mjk3._V1_.jpg" alt="Sonic Prime (2022-2024)" class="movie-poster">
+                <h2 class="movie-title">Sonic Prime</h2>
+                <span class="movie-year">2022-2024 Series</span>
+                <div class="movie-rating">
+                    <span class="stars">⭐⭐⭐⭐</span>
+                    <span class="rating-text">8.5/10</span>
+                </div>
+                <p class="movie-description">
+                    When a battle with Dr. Eggman shatters the universe, Sonic races through parallel dimensions to reconnect with his friends and save the world. This animated Netflix series explores the multiverse with stunning animation and epic adventures.
+                </p>
+                <div class="movie-highlights">
+                    <h4>Series Highlights:</h4>
+                    <ul>
+                        <li>Multiverse storyline with alternate dimensions</li>
+                        <li>High-quality 3D animation</li>
+                        <li>24 episodes across 3 seasons</li>
+                        <li>Netflix exclusive series</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            © 2025 The Sonic Team Fan Page | Gotta Go Fast! 💨
+        </footer>
+    </div>
+</body>
+</html>

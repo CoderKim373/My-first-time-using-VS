@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sonic the Hedgehog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffeb3b 0%, #ff9800 25%, #2196f3 50%, #9c27b0 75%, #4caf50 100%);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        nav {
+            width: 100%;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800, #2196f3);
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .nav-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .nav-title {
+            color: #fff;
+            font-size: 1.5em;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu li {
+            margin: 0 15px;
+        }
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-menu a:hover {
+            color: #ffeb3b;
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 80px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #ffeb3b;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-in;
+        }
+        img {
+            display: block;
+            margin: 0 auto 30px auto;
+            max-width: 350px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+            border: 5px solid #ffeb3b;
+        }
+        img:hover {
+            transform: scale(1.05) rotate(5deg);
+            animation: pulse 1s infinite, borderColorChange 2s infinite;
+        }
+        section {
+            background: linear-gradient(145deg, #ffffff, #fff9c4);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #ff9800;
+            position: relative;
+            overflow: hidden;
+        }
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        section:hover::before {
+            left: 100%;
+        }
+        section:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+        }
+        section h2 {
+            color: #2196f3;
+            border-bottom: 3px solid #9c27b0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: 1.8em;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        section h2:hover {
+            color: #ffeb3b;
+        }
+        section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b);
+            transition: width 0.3s ease;
+        }
+        section:hover h2::after {
+            width: 100px;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 25px;
+            transition: padding-left 0.3s ease;
+        }
+        ul li:hover {
+            padding-left: 30px;
+        }
+        ul li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            color: #ff9800;
+            transition: transform 0.3s ease;
+        }
+        ul li:hover::before {
+            transform: scale(1.2);
+        }
+        p {
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        footer {
+            text-align: center;
+            font-size: 1em;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+            50% { box-shadow: 0 8px 30px rgba(255, 235, 59, 0.6); }
+            100% { box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        }
+        @keyframes borderColorChange {
+            0% { border-color: #ffeb3b; }
+            25% { border-color: #ff9800; }
+            50% { border-color: #2196f3; }
+            75% { border-color: #9c27b0; }
+            100% { border-color: #4caf50; }
+        }
+        section {
+            animation: fadeIn 1s ease-in;
+        }
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .container {
+                margin-top: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <h1 class="nav-title">The Sonic Team</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="sonic.html">Sonic</a></li>
+                <li><a href="tails.html">Tails</a></li>
+                <li><a href="knuckles.html">Knuckles</a></li>
+                <li><a href="shadow.html">Shadow</a></li>
+                <li><a href="quiz.html">Trivia Quiz</a></li>
+                <li><a href="#comments">Comments</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Sonic the Hedgehog</h1>
+        <img src="https://i.pinimg.com/736x/50/45/e9/5045e9b92750b8c397a83dd8b8080d73.jpg" alt="Sonic the Hedgehog" />
+
+        <section id="sonic">
+            <h2>Sonic the Hedgehog ⚡</h2>
+            <p>Sonic the Hedgehog is the main protagonist of the Sonic the Hedgehog video game series. He is a blue anthropomorphic hedgehog known for his incredible speed, which he uses to fight against the evil Dr. Eggman. Sonic is laid-back, cool, and always ready for adventure.</p>
+        </section>
+
+        <section id="sonic-facts">
+            <h2>Sonic Facts 🎉</h2>
+            <ul>
+                <li>Sonic was originally designed to be a rabbit but was changed to a hedgehog. 🦔</li>
+                <li>The Sonic series has sold over 80 million copies worldwide. 🌍</li>
+                <li>Sonic's shoes were inspired by Michael Jackson's boots. 👟</li>
+                <li>Sonic's speed is said to be faster than the speed of sound. ⚡</li>
+                <li>Sonic has appeared in various TV shows and comics. 📺</li>
+            </ul>
+        </section>
+
+        <footer>
+            &copy; 2024 Sonic the Hedgehog Fan Page
+        </footer>
+    </div>
+</body>
+</html>

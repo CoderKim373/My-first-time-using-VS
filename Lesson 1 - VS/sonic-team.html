@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Sonic Team</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffeb3b 0%, #ff9800 25%, #2196f3 50%, #9c27b0 75%, #4caf50 100%);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(45deg, #ffeb3b, #ff9800);
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .back-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 80px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #ffeb3b;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-in;
+        }
+        img {
+            display: block;
+            margin: 0 auto 30px auto;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+            border: 5px solid #ffeb3b;
+        }
+        img:hover {
+            transform: scale(1.05) rotate(5deg);
+            animation: pulse 1s infinite, borderColorChange 2s infinite;
+        }
+        section {
+            background: linear-gradient(145deg, #ffffff, #fff9c4);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #ff9800;
+            position: relative;
+            overflow: hidden;
+        }
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        section:hover::before {
+            left: 100%;
+        }
+        section:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+        }
+        section h2 {
+            color: #2196f3;
+            border-bottom: 3px solid #9c27b0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: 1.8em;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        section h2:hover {
+            color: #ffeb3b;
+        }
+        section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b);
+            transition: width 0.3s ease;
+        }
+        section:hover h2::after {
+            width: 100px;
+        }
+        p {
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        footer {
+            text-align: center;
+            font-size: 1em;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+            50% { box-shadow: 0 8px 30px rgba(255, 235, 59, 0.6); }
+            100% { box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        }
+        @keyframes borderColorChange {
+            0% { border-color: #ffeb3b; }
+            25% { border-color: #ff9800; }
+            50% { border-color: #2196f3; }
+            75% { border-color: #9c27b0; }
+            100% { border-color: #4caf50; }
+        }
+        section {
+            animation: fadeIn 1s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">Go back home</a>
+    <div class="container">
+        <h1>The Sonic Team</h1>
+        <img src="https://i.pinimg.com/736x/59/76/ed/5976ed09c7bfea719a34e0c2d26aadd9.jpg" alt="The Sonic Team">
+
+        <section id="sonic">
+            <h2>Sonic the Hedgehog</h2>
+            <p>Sonic is the main protagonist of the series, a blue hedgehog known for his incredible speed. He fights against Dr. Eggman to protect the world and his friends. Sonic's catchphrase is "Gotta go fast!"</p>
+        </section>
+
+        <section id="tails">
+            <h2>Miles "Tails" Prower</h2>
+            <p>Tails is a two-tailed fox and Sonic's best friend. He's a genius inventor and mechanic who can fly by spinning his tails. Tails often provides technical support and gadgets for the team.</p>
+        </section>
+
+        <section id="knuckles">
+            <h2>Knuckles the Echidna</h2>
+            <p>Knuckles is a red echidna and the guardian of the Master Emerald. He's strong and powerful, often acting as a rival to Sonic but ultimately a loyal ally. He's known for his strength and digging abilities.</p>
+        </section>
+
+        <section id="shadow">
+            <h2>Shadow the Hedgehog</h2>
+            <p>Shadow is a dark hedgehog created by Professor Gerald Robotnik. He has chaos powers and is incredibly fast. Shadow is mysterious and often operates alone, but can be an ally when needed.</p>
+        </section>
+
+        <footer>
+            &copy; 2025 Sonic the Hedgehog Fan Page
+        </footer>
+    </div>
+
+    <!-- AI Chatbot Tailer -->
+    <style>
+        #tailer-chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #ff9800;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.2em;
+            user-select: none;
+            -webkit-user-select: none;
+            z-index: 10000;
+        }
+        #tailer-chatbot:hover {
+            background: #f57c00;
+        }
+        #tailer-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            max-height: 400px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            z-index: 10000;
+        }
+        #tailer-header {
+            background: #ff9800;
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        #tailer-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            color: #333;
+        }
+        #tailer-input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+        #tailer-input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-size: 1em;
+            outline: none;
+        }
+        #tailer-send {
+            background: #ff9800;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        #tailer-send:hover {
+            background: #f57c00;
+        }
+        .tailer-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 80%;
+            clear: both;
+        }
+        .tailer-message.user {
+            background: #ffeb3b;
+            color: #333;
+            float: right;
+            text-align: right;
+        }
+        .tailer-message.bot {
+            background: #e0e0e0;
+            color: #333;
+            float: left;
+            text-align: left;
+        }
+    </style>
+
+    <div id="tailer-chatbot" title="Chat with Tailer">T</div>
+    <div id="tailer-window">
+        <div id="tailer-header">Tailer AI Chatbot</div>
+        <div id="tailer-messages"></div>
+        <div id="tailer-input-container">
+            <input type="text" id="tailer-input" placeholder="Type your message..." />
+            <button id="tailer-send">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const tailerChatbot = document.getElementById('tailer-chatbot');
+        const tailerWindow = document.getElementById('tailer-window');
+        const tailerMessages = document.getElementById('tailer-messages');
+        const tailerInput = document.getElementById('tailer-input');
+        const tailerSend = document.getElementById('tailer-send');
+
+        tailerChatbot.addEventListener('click', () => {
+            if (tailerWindow.style.display === 'flex') {
+                tailerWindow.style.display = 'none';
+            } else {
+                tailerWindow.style.display = 'flex';
+                tailerInput.focus();
+            }
+        });
+
+        function appendMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('tailer-message', sender);
+            messageDiv.textContent = text;
+            tailerMessages.appendChild(messageDiv);
+            tailerMessages.scrollTop = tailerMessages.scrollHeight;
+        }
+
+        async function getBotResponse(message) {
+            // Simple simulated AI response for demonstration
+            const lowerMsg = message.toLowerCase();
+            if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
+                return 'Hello! I am Tailer, your Sonic Team assistant. How can I help you today?';
+            } else if (lowerMsg.includes('sonic')) {
+                return 'Sonic is the main protagonist, known for his incredible speed!';
+            } else if (lowerMsg.includes('tails')) {
+                return 'Tails is Sonic\'s best friend and a genius inventor with two tails!';
+            } else if (lowerMsg.includes('knuckles')) {
+                return 'Knuckles is the strong guardian of the Master Emerald.';
+            } else if (lowerMsg.includes('shadow')) {
+                return 'Shadow is a mysterious and powerful hedgehog with chaos powers.';
+            } else {
+                return 'Sorry, I am still learning. Can you ask about Sonic, Tails, Knuckles, or Shadow?';
+            }
+        }
+
+        tailerSend.addEventListener('click', async () => {
+            const message = tailerInput.value.trim();
+            if (!message) return;
+            appendMessage(message, 'user');
+            tailerInput.value = '';
+            const response = await getBotResponse(message);
+            appendMessage(response, 'bot');
+        });
+
+        tailerInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                tailerSend.click();
+            }
+        });
+    </script>
+</body>
+</html>

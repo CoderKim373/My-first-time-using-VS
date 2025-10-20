@@ -1,60 +1,808 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Lesson 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Sonic Team</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ffeb3b;
+            --secondary-color: #ff9800;
+            --accent-color: #2196f3;
+            --text-color: #333;
+            --bg-color: #ffffff;
+            --section-bg: rgba(255, 255, 255, 0.95);
+        }
+        
+        [data-theme="dark"] {
+            --primary-color: #ffc107;
+            --secondary-color: #ff6f00;
+            --accent-color: #1976d2;
+            --text-color: #e0e0e0;
+            --bg-color: #121212;
+            --section-bg: rgba(30, 30, 30, 0.95);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 25%, var(--accent-color) 50%, #9c27b0 75%, #4caf50 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }       
+        nav {
+            width: 100%;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800, #2196f3);
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .nav-title {
+            color: #fff;
+            font-size: 1.5em;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-title:hover {
+            transform: scale(1.05);
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+        
+        .theme-toggle:hover {
+            background: #fff;
+            color: var(--accent-color);
+        }
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .nav-menu li {
+            margin: 0 8px;
+        }
+        .nav-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95em;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .nav-menu a:hover {
+            color: #333;
+            background: rgba(255, 235, 59, 0.9);
+            transform: translateY(-2px);
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--section-bg);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 80px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: grid;
+            gap: 25px;
+            grid-template-columns: 1fr;
+        }
+        
+        .hero-section {
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 20px 0;
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: clamp(2em, 5vw, 3em);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-in, textGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes textGlow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+            to { text-shadow: 2px 2px 20px var(--primary-color), 2px 2px 4px rgba(0,0,0,0.3); }
+        }
+        img {
+            display: block;
+            margin: 0 auto 30px auto;
+            max-width: 350px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+            border: 5px solid #ffeb3b;
+        }
+        img:hover {
+            transform: scale(1.05) rotate(5deg);
+            animation: pulse 1s infinite, borderColorChange 2s infinite;
+        }
+        section {
+            background: var(--section-bg);
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 0.6s ease forwards;
+        }
+        
+        section:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+        
+        section:nth-child(odd) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 235, 59, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        section:hover::before {
+            left: 100%;
+        }
+        section:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+        }
+        section h2 {
+            color: var(--accent-color);
+            border-bottom: 3px solid #9c27b0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-size: clamp(1.4em, 3vw, 1.8em);
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        section h2:hover {
+            color: var(--primary-color);
+            transform: translateX(10px);
+        }
+        section h2:hover {
+            color: #ffeb3b;
+        }
+        section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b);
+            transition: width 0.3s ease;
+        }
+        section:hover h2::after {
+            width: 100px;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 25px;
+            transition: padding-left 0.3s ease;
+        }
+        ul li:hover {
+            padding-left: 30px;
+        }
+        ul li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            color: #ff9800;
+            transition: transform 0.3s ease;
+        }
+        ul li:hover::before {
+            transform: scale(1.2);
+        }
+        p {
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        footer {
+            text-align: center;
+            font-size: 1em;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            background: linear-gradient(90deg, #ffeb3b, #ff9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+            50% { box-shadow: 0 8px 30px rgba(255, 235, 59, 0.6); }
+            100% { box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        }
+        @keyframes borderColorChange {
+            0% { border-color: var(--primary-color); }
+            25% { border-color: var(--secondary-color); }
+            50% { border-color: var(--accent-color); }
+            75% { border-color: #9c27b0; }
+            100% { border-color: #4caf50; }
+        }
+        
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            transform-origin: left;
+            transform: scaleX(0);
+            z-index: 1001;
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+        @media (max-width: 1024px) {
+            .nav-menu li {
+                margin: 0 6px;
+            }
+            .nav-menu a {
+                font-size: 0.9em;
+                padding: 6px 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: linear-gradient(90deg, #ffeb3b, #ff9800, #2196f3);
+                flex-direction: column;
+                padding: 20px 0;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            }
+            .nav-menu.active {
+                display: flex;
+            }
+            .nav-menu li {
+                margin: 8px 0;
+                text-align: center;
+            }
+            .nav-menu a {
+                font-size: 1em;
+                padding: 10px 15px;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .container {
+                margin-top: 60px;
+                padding: 20px;
+                grid-template-columns: 1fr;
+            }
+            
+            .characters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-toggle {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+            img {
+                max-width: 280px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="scroll-indicator"></div>
+    <nav>
+        <div class="nav-container">
+            <h1 class="nav-title">The Sonic Team</h1>
+            <div style="display: flex; align-items: center;">
+                <ul class="nav-menu">
+                    <li><a href="sonic.html">Sonic</a></li>
+                    <li><a href="tails.html">Tails</a></li>
+                    <li><a href="knuckles.html">Knuckles</a></li>
+                    <li><a href="shadow.html">Shadow</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="movies.html">Sonic Movies</a></li>
+                    <li><a href="quiz.html">Trivia Quiz</a></li>
+                    <li><a href="#comments">Comments</a></li>
+                </ul>
+                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <button class="floating-btn" onclick="scrollToTop()" title="Back to top">↑</button>
+    <div class="container">
+        <div class="hero-section">
+            <h1>The Sonic Team</h1>
+            <img src="https://i.pinimg.com/736x/59/76/ed/5976ed09c7bfea719a34e0c2d26aadd9.jpg" alt="The Sonic Team" />
+        </div>
 
-    
-    <h1>Human First</h1>
-    <h2>Slogan: “To us… You go first.”</h2>
-    <h3>Who Are We?</h3>
-    <p>We are more than a herbal medicine brand. We are a wellness community built on one simple truth: You come first.
-In everything we do — from the herbs we carefully select to the way we answer your calls — you are our first and only priority. With us, you truly go first.
-</p>
-    <h3>Our Mission:</h3>
-    <p>At Human First, we believe that nature holds powerful answers for well-being, answers that often bypass the need for harsh chemical medicines.
-Our goal is simple: to bring herbal medicine back to the people — clean, honest, sustainable, and crafted with love.
-But we don’t stop at selling products. We offer something the modern world has forgotten: real conversations. Real care. Real solutions.
-</p>
-    <img src="https://i.pinimg.com/736x/13/bb/a4/13bba4445808c5185f649e15bd855653.jpg">
-     <h3>What Makes Us Different?</h3>
-     <p>No chatbots in our calls. When you connect with us, you get real people who listen intently to your needs, who wait for you to speak, and who truly hear your emotions and symptoms.
-Our herbal products are crafted from ethically sourced, organic plants, directly from the vibrant fields of India.
-Every remedy is made with both your health and our planet, Earth, in mind.
-</p>
-     <h3>Our Products:</h3>
-     <p>Our products are engineered to provide your body with the natural support it requires, including soothing teas, potent tinctures, healing oils, and wellness capsules. And a steadfast promise: purely herbs, no synthetic chemicals. Just the natural essence your immune system truly craves.
-Need help sleeping? Struggling with stress? Want to boost immunity or digestion? We’ve got a blend for that — and a friendly human to guide you through taking your medicine, and answer all your questions about our herbs.
-</p>
-      <img src="https://i.pinimg.com/1200x/b5/57/ad/b557ad2b2c3b8c7e7bcc5583514d7642.jpg"
+        <div class="characters-grid">
+            <section id="sonic">
+                <h2>Sonic the Hedgehog ⚡</h2>
+                <p>Sonic the Hedgehog is the main protagonist of the Sonic the Hedgehog video game series. He is a blue anthropomorphic hedgehog known for his incredible speed, which he uses to fight against the evil Dr. Eggman. Sonic is laid-back, cool, and always ready for adventure.</p>
+            </section>
 
-      
-      <h3>Our Promise:</h3>
-      <p>Our promise is simple and strong:
- We have personalised wellness consultations.
-Sustainable packaging.
-Ethically sourced herbs.
-And above all, genuine human care.
-</p>
-       <img src="https://i.pinimg.com/1200x/b0/97/57/b097577a0a9172403a8b62bdb731b24b.jpg"
+            <section id="tails">
+                <h2>Tails 🦊</h2>
+                <p>Tails, also known as Miles "Tails" Prower, is a fictional character from the Sonic the Hedgehog series. He is a young, intelligent, and loyal two-tailed fox who is Sonic's best friend and sidekick. Tails is known for his ability to fly by spinning his two tails like a helicopter rotor.</p>
+            </section>
 
+            <section id="knuckles">
+                <h2>Knuckles the Echidna ✊</h2>
+                <p>Knuckles the Echidna is a red anthropomorphic echidna and a guardian of the Master Emerald. He is strong, tough, and initially distrustful of others, but he is loyal to his friends once he trusts them. His powerful fists can break through walls and his gliding ability makes him a formidable ally.</p>
+            </section>
 
-       <h3>Who do we serve?</h3>
-       <p>People tired of chemicals, seeking a path to natural, lasting wellness.
-Those who believe in natural healing, and even those who don't yet – we will show them the profound power of nature's gifts.
-Eco-conscious souls who care about the planet as much as they care about their health.
-</p>
-        <h3>How Do We Reach You?</h3>
-        <p>Through our online store, with support that feels like a friend chatting with you.
-On social media, where we don’t just sell — we teach, share, and connect with people around the globe.
-And in person — at local markets, wellness fairs, and pop-up events.</p>
-     
-        <img src="https://i.pinimg.com/1200x/be/a5/d3/bea5d3f8b6335d2a4bf7db7f6798e67d.jpg"
+            <section id="shadow">
+                <h2>Shadow the Hedgehog 🖤</h2>
+                <p>Shadow the Hedgehog is the "Ultimate Life Form" created by Professor Gerald Robotnik. He is a black and red hedgehog with similar speed to Sonic but with a more serious and brooding personality. Shadow has the ability to use Chaos Control and is often torn between his past and doing what's right.</p>
+            </section>
+        </div>
 
-     
-    
+        <section id="abilities">
+            <h2>Team Abilities 🌟</h2>
+            <ul>
+                <li>Super Speed - Sonic's signature ability to run at incredible speeds</li>
+                <li>Flight - Tails can fly using his twin tails as rotors</li>
+                <li>Gliding & Strength - Knuckles can glide and punch through obstacles</li>
+                <li>Chaos Control - Shadow can manipulate time and space</li>
+                <li>Teamwork - Together they're unstoppable!</li>
+            </ul>
+        </section>
 
+        <section id="comments">
+            <h2>Comments 💬</h2>
+            <p>Share your thoughts about the Sonic Team! What's your favorite character or game?</p>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                <p><em>Comments section coming soon! Check back later for interactive features.</em></p>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2024 The Sonic Team Fan Page | Gotta Go Fast! 💨</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.querySelector('.theme-toggle');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                body.removeAttribute('data-theme');
+                themeBtn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeBtn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeBtn = document.querySelector('.theme-toggle');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeBtn.textContent = '☀️';
+            }
+        });
+        
+        // Scroll progress indicator
+        window.addEventListener('scroll', () => {
+            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.querySelector('.scroll-indicator').style.transform = `scaleX(${scrolled / 100})`;
+        });
+        
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Hamburger menu toggle
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+        
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>        <section id="comments">
+            <h2>Comments 💬</h2>
+            <form id="commentForm" style="margin-bottom: 20px;">
+                <input type="text" id="nameInput" placeholder="Your Name" required style="width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid var(--accent-color); border-radius: 8px; font-size: 1em; background: var(--section-bg); color: var(--text-color);">
+                <textarea id="commentInput" placeholder="Your Comment" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid var(--accent-color); border-radius: 8px; font-size: 1em; min-height: 80px; background: var(--section-bg); color: var(--text-color); resize: vertical;"></textarea>
+                <button type="submit" style="background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: var(--text-color); border: none; padding: 12px 24px; border-radius: 8px; font-size: 1em; cursor: pointer; font-weight: bold; transition: transform 0.2s ease;">Submit Comment</button>
+            </form>
+            <div id="commentsList"></div>
+        </section>
+
+        <footer>
+            <p>© 2024 The Sonic Team Fan Page | Gotta Go Fast! 💨</p>
+        </footer>
+    </div>
+
+    <script>
+        // Comments functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const commentForm = document.getElementById('commentForm');
+            const nameInput = document.getElementById('nameInput');
+            const commentInput = document.getElementById('commentInput');
+            const commentsList = document.getElementById('commentsList');
+
+            let comments = JSON.parse(localStorage.getItem('sonicComments')) || [];
+            displayComments();
+
+            commentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = nameInput.value.trim();
+                const comment = commentInput.value.trim();
+                if (name && comment) {
+                    const newComment = { 
+                        name, 
+                        comment, 
+                        timestamp: new Date().toLocaleString(),
+                        id: Date.now()
+                    };
+                    comments.unshift(newComment);
+                    localStorage.setItem('sonicComments', JSON.stringify(comments));
+                    displayComments();
+                    nameInput.value = '';
+                    commentInput.value = '';
+                    
+                    // Add success animation
+                    const btn = e.target.querySelector('button');
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => btn.style.transform = 'scale(1)', 150);
+                }
+            });
+
+            function displayComments() {
+                commentsList.innerHTML = comments.length ? '' : '<p style="text-align: center; color: #666; font-style: italic;">No comments yet. Be the first to share your thoughts!</p>';
+                comments.forEach((c) => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.style.cssText = `
+                        background: var(--section-bg);
+                        padding: 15px;
+                        margin-bottom: 15px;
+                        border-radius: 10px;
+                        border-left: 4px solid var(--accent-color);
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        transition: transform 0.2s ease;
+                    `;
+                    commentDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <strong style="color: var(--accent-color);">${c.name}</strong>
+                            <small style="color: #666;">${c.timestamp}</small>
+                        </div>
+                        <p style="margin: 0; line-height: 1.5;">${c.comment}</p>
+                    `;
+                    commentDiv.addEventListener('mouseenter', () => commentDiv.style.transform = 'translateX(5px)');
+                    commentDiv.addEventListener('mouseleave', () => commentDiv.style.transform = 'translateX(0)');
+                    commentsList.appendChild(commentDiv);
+                });
+            }
+        });
+    </script>
+
+    <!-- Tailer Chatbot -->
+    <div id="tailer-chatbot" title="Chat with Tailer">T</div>
+    <div id="tailer-window">
+        <div id="tailer-header">Tailer AI Chatbot</div>
+        <div id="tailer-messages"></div>
+        <div id="tailer-input-container">
+            <input type="text" id="tailer-input" placeholder="Type your message..." />
+            <button id="tailer-send">Send</button>
+        </div>
+    </div>
+
+    <style>
+        #tailer-chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2em;
+            z-index: 10000;
+            transition: all 0.3s ease;
+        }
+        #tailer-chatbot:hover {
+            background: var(--primary-color);
+            color: var(--text-color);
+            transform: scale(1.1);
+        }
+        #tailer-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            max-height: 400px;
+            background: var(--section-bg);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10000;
+        }
+        #tailer-header {
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        #tailer-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            color: var(--text-color);
+            max-height: 250px;
+        }
+        #tailer-input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+        #tailer-input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-size: 1em;
+            outline: none;
+            background: var(--section-bg);
+            color: var(--text-color);
+        }
+        #tailer-send {
+            background: var(--secondary-color);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        #tailer-send:hover {
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+        .tailer-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 80%;
+            clear: both;
+        }
+        .tailer-message.user {
+            background: var(--primary-color);
+            color: var(--text-color);
+            float: right;
+            text-align: right;
+        }
+        .tailer-message.bot {
+            background: #e0e0e0;
+            color: #333;
+            float: left;
+            text-align: left;
+        }
+    </style>
+
+    <script>
+        // Tailer Chatbot functionality
+        const tailerChatbot = document.getElementById('tailer-chatbot');
+        const tailerWindow = document.getElementById('tailer-window');
+        const tailerMessages = document.getElementById('tailer-messages');
+        const tailerInput = document.getElementById('tailer-input');
+        const tailerSend = document.getElementById('tailer-send');
+
+        tailerChatbot.addEventListener('click', () => {
+            if (tailerWindow.style.display === 'flex') {
+                tailerWindow.style.display = 'none';
+            } else {
+                tailerWindow.style.display = 'flex';
+                tailerInput.focus();
+            }
+        });
+
+        function appendMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('tailer-message', sender);
+            messageDiv.textContent = text;
+            tailerMessages.appendChild(messageDiv);
+            tailerMessages.scrollTop = tailerMessages.scrollHeight;
+        }
+
+        function getBotResponse(message) {
+            const lowerMsg = message.toLowerCase();
+            if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
+                return 'Hello! I am Tailer, your Sonic Team assistant. How can I help you today?';
+            } else if (lowerMsg.includes('sonic')) {
+                return 'Sonic is the main protagonist, known for his incredible speed!';
+            } else if (lowerMsg.includes('tails')) {
+                return 'Tails is Sonic\'s best friend and a genius inventor with two tails!';
+            } else if (lowerMsg.includes('knuckles')) {
+                return 'Knuckles is the strong guardian of the Master Emerald.';
+            } else if (lowerMsg.includes('shadow')) {
+                return 'Shadow is a mysterious and powerful hedgehog with chaos powers.';
+            } else if (lowerMsg.includes('movie')) {
+                return 'Check out our Sonic Movies page for info about all the films!';
+            } else {
+                return 'Sorry, I am still learning. Ask me about Sonic, Tails, Knuckles, Shadow, or the movies!';
+            }
+        }
+
+        tailerSend.addEventListener('click', () => {
+            const message = tailerInput.value.trim();
+            if (!message) return;
+            appendMessage(message, 'user');
+            tailerInput.value = '';
+            setTimeout(() => {
+                const response = getBotResponse(message);
+                appendMessage(response, 'bot');
+            }, 500);
+        });
+
+        tailerInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                tailerSend.click();
+            }
+        });
+    </script>
 </body>
 </html>
