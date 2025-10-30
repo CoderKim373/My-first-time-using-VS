@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - The Sonic Team</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
             --primary-color: #ffeb3b;
@@ -35,9 +36,34 @@
             padding: 40px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             width: 100%;
             max-width: 400px;
             text-align: center;
+        }
+
+        .toggle-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #f0f0f0;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary-color);
+            color: #333;
         }
 
         .logo {
@@ -106,37 +132,144 @@
 </head>
 <body>
     <div class="login-container">
-        <h1 class="logo">⚡ Sonic Team Login</h1>
-        
+        <h1 class="logo">⚡ Sonic Team</h1>
+
+        <div class="toggle-container">
+            <button id="loginToggle" class="toggle-btn active">Login</button>
+            <button id="signupToggle" class="toggle-btn">Sign Up</button>
+        </div>
+
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            
+
             <button type="submit" class="login-btn">Login</button>
         </form>
-        
+
+        <form id="signupForm" style="display: none;">
+            <div class="form-group">
+                <label for="signupUsername">Username</label>
+                <input type="text" id="signupUsername" name="signupUsername" required>
+            </div>
+
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" name="signupEmail" required>
+            </div>
+
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" name="signupPassword" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+
+            <button type="submit" class="login-btn">Sign Up</button>
+        </form>
+
+        <div id="g_id_onload"
+             data-client_id="324068164423-58gtguqfmasr5od23l6ckcig2q2tfid5.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
+
         <a href="index.html" class="back-link">← Back to Home</a>
     </div>
 
     <script>
+        // Toggle between login and signup
+        document.getElementById('loginToggle').addEventListener('click', function() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+            this.classList.add('active');
+            document.getElementById('signupToggle').classList.remove('active');
+        });
+
+        document.getElementById('signupToggle').addEventListener('click', function() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            this.classList.add('active');
+            document.getElementById('loginToggle').classList.remove('active');
+        });
+
+        // Login form handler
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
+
             if (username && password) {
                 localStorage.setItem('sonicUser', JSON.stringify({username, password, loggedIn: true}));
                 alert('Welcome to the Sonic Team, ' + username + '!');
                 window.location.href = 'index.html';
             }
         });
+
+        // Signup form handler
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (username && email && password) {
+                localStorage.setItem('sonicUser', JSON.stringify({username, email, password, loggedIn: true}));
+                alert('Account created successfully! Welcome to the Sonic Team, ' + username + '!');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Google Sign-In handler
+        function handleCredentialResponse(response) {
+            const responsePayload = decodeJwtResponse(response.credential);
+            const user = {
+                username: responsePayload.name,
+                email: responsePayload.email,
+                googleId: responsePayload.sub,
+                loggedIn: true,
+                isGoogle: true
+            };
+            localStorage.setItem('sonicUser', JSON.stringify(user));
+            alert('Welcome to the Sonic Team, ' + responsePayload.name + '!');
+            window.location.href = 'index.html';
+        }
+
+        function decodeJwtResponse(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        }
     </script>
 </body>
 </html>

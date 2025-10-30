@@ -87,6 +87,7 @@
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         h1 {
@@ -265,7 +266,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('sonicUser') || '{}');
             isLoggedIn = user.loggedIn || false;
-            
+
+            // Redirect if not logged in
+            if (!isLoggedIn) {
+                alert('You must be logged in to access the Arcade. Redirecting to login page...');
+                window.location.href = 'login.html';
+                return;
+            }
+
             // Update auth link
             const authLink = document.getElementById('authLink');
             if (isLoggedIn) {
