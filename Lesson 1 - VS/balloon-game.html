@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Pop - The Sonic Team</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('https://wallpaperaccess.com/full/1086060.jpg') center/cover no-repeat fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        canvas {
+            border: 3px solid #333;
+            border-radius: 10px;
+            background: url('https://i.pinimg.com/1200x/2d/19/1e/2d191e8631ce581a0d584a2d861501bd.jpg') center/cover no-repeat;
+            cursor: crosshair;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff9800;
+            margin: 10px 0;
+        }
+        
+        .back-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .back-btn:hover {
+            background: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎈 Balloon Pop</h1>
+        <div class="score">Score: <span id="score">0</span> | Time: <span id="timer">30</span>s</div>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div class="controls">
+            <p>Click to shoot balloons!</p>
+            <p>Playing as: <strong id="character"></strong></p>
+        </div>
+        <button class="back-btn" onclick="window.location.href='arcade.html'">← Back to Arcade</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const characterElement = document.getElementById('character');
+        
+        // Get selected character
+        const character = localStorage.getItem('selectedCharacter') || 'sonic';
+        characterElement.textContent = character.toUpperCase();
+        
+        // Character colors
+        const colors = {
+            sonic: '#0066ff',
+            tails: '#ff9900',
+            knuckles: '#ff0000',
+            shadow: '#333333'
+        };
+        
+        // Game variables
+        let balloons = [];
+        let score = 0;
+        let timeLeft = 30;
+        let gameRunning = true;
+        let player = {
+            x: canvas.width / 2,
+            y: canvas.height - 50,
+            width: 60,
+            height: 60
+        };
+        
+        // Create balloon
+        function createBalloon() {
+            balloons.push({
+                x: Math.random() * (canvas.width - 40),
+                y: Math.random() * (canvas.height - 100) + 50,
+                radius: 20 + Math.random() * 15,
+                color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                speedX: (Math.random() - 0.5) * 2,
+                speedY: (Math.random() - 0.5) * 2
+            });
+        }
+        
+        // Character images
+        const characterImages = {
+            sonic: 'https://i.pinimg.com/736x/d0/99/ef/d099ef42e201aecf8fe0c80a9794c482.jpg',
+            tails: 'https://i.pinimg.com/736x/9a/b0/7c/9ab07c52c48cf956abbba65bbf11e138.jpg',
+            knuckles: 'https://i.pinimg.com/736x/49/65/58/496558595c344aca8692a493b2840d1a.jpg',
+            shadow: 'https://i.pinimg.com/736x/d0/d5/f9/d0d5f9fb8be66f1682bb67978c08711b.jpg'
+        };
+        
+        let characterImg = new Image();
+        characterImg.src = characterImages[character];
+        
+        // Draw player
+        function drawPlayer() {
+            if (characterImg.complete) {
+                ctx.drawImage(characterImg, player.x, player.y, player.width, player.height);
+            } else {
+                // Fallback circle
+                ctx.fillStyle = colors[character];
+                ctx.beginPath();
+                ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Nerf gun
+            ctx.fillStyle = '#ff6600';
+            ctx.fillRect(player.x + player.width/2 - 2, player.y - 15, 4, 15);
+            ctx.fillStyle = '#ffaa00';
+            ctx.fillRect(player.x + player.width/2 - 1, player.y - 12, 2, 8);
+        }
+        
+        // Draw balloons
+        function drawBalloons() {
+            balloons.forEach(balloon => {
+                // Balloon gradient for 3D effect
+                const balloonGradient = ctx.createRadialGradient(
+                    balloon.x - balloon.radius/3, balloon.y - balloon.radius/3, 0,
+                    balloon.x, balloon.y, balloon.radius
+                );
+                balloonGradient.addColorStop(0, 'white');
+                balloonGradient.addColorStop(0.3, balloon.color);
+                balloonGradient.addColorStop(1, balloon.color.replace('60%', '30%'));
+                
+                ctx.fillStyle = balloonGradient;
+                ctx.beginPath();
+                ctx.arc(balloon.x, balloon.y, balloon.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Balloon highlight
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                ctx.beginPath();
+                ctx.arc(balloon.x - balloon.radius/3, balloon.y - balloon.radius/3, balloon.radius/4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Balloon string with shadow
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(balloon.x, balloon.y + balloon.radius);
+                ctx.lineTo(balloon.x + Math.sin(Date.now() * 0.001) * 3, balloon.y + balloon.radius + 20);
+                ctx.stroke();
+                
+                // String shadow
+                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(balloon.x + 1, balloon.y + balloon.radius + 1);
+                ctx.lineTo(balloon.x + Math.sin(Date.now() * 0.001) * 3 + 1, balloon.y + balloon.radius + 21);
+                ctx.stroke();
+            });
+        }
+        
+        // Update balloons
+        function updateBalloons() {
+            balloons.forEach((balloon, index) => {
+                balloon.x += balloon.speedX;
+                balloon.y += balloon.speedY;
+                
+                // Bounce off walls
+                if (balloon.x <= balloon.radius || balloon.x >= canvas.width - balloon.radius) {
+                    balloon.speedX *= -1;
+                }
+                if (balloon.y <= balloon.radius || balloon.y >= canvas.height - balloon.radius) {
+                    balloon.speedY *= -1;
+                }
+            });
+        }
+        
+        // Check balloon click
+        function checkBalloonClick(mouseX, mouseY) {
+            balloons.forEach((balloon, index) => {
+                const distance = Math.sqrt((mouseX - balloon.x) ** 2 + (mouseY - balloon.y) ** 2);
+                if (distance <= balloon.radius) {
+                    // Pop balloon
+                    balloons.splice(index, 1);
+                    score += 10;
+                    scoreElement.textContent = score;
+                    
+                    // Create pop effect
+                    createPopEffect(balloon.x, balloon.y);
+                }
+            });
+        }
+        
+        // Create pop effect
+        function createPopEffect(x, y) {
+            ctx.fillStyle = '#ffeb3b';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('POP!', x, y);
+        }
+        
+        // Game timer
+        function updateTimer() {
+            if (gameRunning && timeLeft > 0) {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    gameOver();
+                }
+            }
+        }
+        
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Time Up!', canvas.width/2, canvas.height/2 - 70);
+            ctx.fillText(`Final Score: ${score}`, canvas.width/2, canvas.height/2 - 30);
+            ctx.font = '16px Arial';
+            ctx.fillText('Press SPACE for +10s or R to restart', canvas.width/2, canvas.height/2 + 20);
+        }
+        
+        function revive() {
+            timeLeft = 10;
+            gameRunning = true;
+        }
+        
+        // Draw everything
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawBalloons();
+            drawPlayer();
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (gameRunning) {
+                updateBalloons();
+                
+                // Create new balloons
+                if (Math.random() < 0.02 && balloons.length < 8) {
+                    createBalloon();
+                }
+            }
+            
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Event listeners
+        canvas.addEventListener('click', (e) => {
+            if (gameRunning) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                checkBalloonClick(mouseX, mouseY);
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (gameRunning) {
+                const rect = canvas.getBoundingClientRect();
+                player.x = (e.clientX - rect.left) - player.width/2;
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !gameRunning) {
+                revive();
+            }
+            if (e.code === 'KeyR' && !gameRunning) {
+                location.reload();
+            }
+        });
+        
+        // Start game
+        for (let i = 0; i < 5; i++) {
+            createBalloon();
+        }
+        
+        setInterval(updateTimer, 1000);
+        gameLoop();
+    </script>
+</body>
+</html>

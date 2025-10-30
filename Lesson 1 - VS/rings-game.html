@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ring Collector - The Sonic Team</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('https://wallpaperaccess.com/full/1086060.jpg') center/cover no-repeat fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        canvas {
+            border: 3px solid #333;
+            border-radius: 10px;
+            background: url('https://i.pinimg.com/1200x/2d/19/1e/2d191e8631ce581a0d584a2d861501bd.jpg') center/cover no-repeat;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff9800;
+            margin: 10px 0;
+        }
+        
+        .back-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .back-btn:hover {
+            background: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>💎 Ring Collector</h1>
+        <div class="score">Rings: <span id="rings">0</span> | Lives: <span id="lives">3</span></div>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div class="controls">
+            <p>Use ARROW KEYS to move and collect rings!</p>
+            <p>Playing as: <strong id="character"></strong></p>
+        </div>
+        <button class="back-btn" onclick="window.location.href='arcade.html'">← Back to Arcade</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const ringsElement = document.getElementById('rings');
+        const livesElement = document.getElementById('lives');
+        const characterElement = document.getElementById('character');
+        
+        // Get selected character
+        const character = localStorage.getItem('selectedCharacter') || 'sonic';
+        characterElement.textContent = character.toUpperCase();
+        
+        // Character colors
+        const colors = {
+            sonic: '#0066ff',
+            tails: '#ff9900',
+            knuckles: '#ff0000',
+            shadow: '#333333'
+        };
+        
+        // Game variables
+        let player = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 50,
+            height: 50,
+            speed: 5
+        };
+        
+        let rings = [];
+        let obstacles = [];
+        let ringCount = 0;
+        let lives = 3;
+        let gameRunning = true;
+        let keys = {};
+        
+        // Create ring
+        function createRing() {
+            rings.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 60) + 30,
+                radius: 15,
+                collected: false
+            });
+        }
+        
+        // Create obstacle
+        function createObstacle() {
+            obstacles.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 80) + 40,
+                width: 30,
+                height: 40,
+                speed: 3
+            });
+        }
+        
+        // Character images
+        const characterImages = {
+            sonic: 'https://i.pinimg.com/736x/d0/99/ef/d099ef42e201aecf8fe0c80a9794c482.jpg',
+            tails: 'https://i.pinimg.com/736x/9a/b0/7c/9ab07c52c48cf956abbba65bbf11e138.jpg',
+            knuckles: 'https://i.pinimg.com/736x/49/65/58/496558595c344aca8692a493b2840d1a.jpg',
+            shadow: 'https://i.pinimg.com/736x/d0/d5/f9/d0d5f9fb8be66f1682bb67978c08711b.jpg'
+        };
+        
+        let characterImg = new Image();
+        characterImg.src = characterImages[character];
+        
+        // Draw player
+        function drawPlayer() {
+            if (characterImg.complete) {
+                ctx.drawImage(characterImg, player.x, player.y, player.width, player.height);
+            } else {
+                // Fallback circle
+                ctx.fillStyle = colors[character];
+                ctx.beginPath();
+                ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Speed lines for effect
+            ctx.strokeStyle = '#00aaff';
+            ctx.lineWidth = 2;
+            for (let i = 1; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(player.x - i * 8, player.y + 10);
+                ctx.lineTo(player.x - i * 8 + 5, player.y + 15);
+                ctx.stroke();
+            }
+        }
+        
+        // Draw rings
+        function drawRings() {
+            rings.forEach(ring => {
+                if (!ring.collected) {
+                    // Ring gradient for 3D effect
+                    const ringGradient = ctx.createLinearGradient(
+                        ring.x - ring.radius, ring.y - ring.radius,
+                        ring.x + ring.radius, ring.y + ring.radius
+                    );
+                    ringGradient.addColorStop(0, '#FFD700');
+                    ringGradient.addColorStop(0.5, '#FFEB3B');
+                    ringGradient.addColorStop(1, '#FFA000');
+                    
+                    // Outer ring
+                    ctx.strokeStyle = ringGradient;
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    // Inner highlight
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(ring.x, ring.y, ring.radius - 4, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    // Sparkle effect
+                    const sparkleTime = Date.now() * 0.01;
+                    ctx.fillStyle = '#FFFFFF';
+                    for (let i = 0; i < 4; i++) {
+                        const angle = (sparkleTime + i * Math.PI/2) % (Math.PI * 2);
+                        const sparkleX = ring.x + Math.cos(angle) * (ring.radius + 5);
+                        const sparkleY = ring.y + Math.sin(angle) * (ring.radius + 5);
+                        ctx.beginPath();
+                        ctx.arc(sparkleX, sparkleY, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            });
+        }
+        
+        // Draw obstacles
+        function drawObstacles() {
+            ctx.fillStyle = '#f44336';
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                
+                // Spikes
+                ctx.fillStyle = '#d32f2f';
+                for (let i = 0; i < obstacle.width; i += 6) {
+                    ctx.fillRect(obstacle.x + i, obstacle.y - 5, 3, 5);
+                }
+                ctx.fillStyle = '#f44336';
+            });
+        }
+        
+        // Update player
+        function updatePlayer() {
+            if (keys['ArrowUp'] && player.y > 0) {
+                player.y -= player.speed;
+            }
+            if (keys['ArrowDown'] && player.y < canvas.height - player.height) {
+                player.y += player.speed;
+            }
+            if (keys['ArrowLeft'] && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys['ArrowRight'] && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            }
+        }
+        
+        // Update rings
+        function updateRings() {
+            rings.forEach((ring, index) => {
+                ring.x -= 2;
+                
+                // Check collection
+                const distance = Math.sqrt((player.x + player.width/2 - ring.x) ** 2 + 
+                                         (player.y + player.height/2 - ring.y) ** 2);
+                if (distance < ring.radius + 15 && !ring.collected) {
+                    ring.collected = true;
+                    ringCount++;
+                    ringsElement.textContent = ringCount;
+                }
+                
+                // Remove off-screen rings
+                if (ring.x < -ring.radius) {
+                    rings.splice(index, 1);
+                }
+            });
+        }
+        
+        // Update obstacles
+        function updateObstacles() {
+            obstacles.forEach((obstacle, index) => {
+                obstacle.x -= obstacle.speed;
+                
+                // Check collision
+                if (player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.height > obstacle.y) {
+                    
+                    lives--;
+                    livesElement.textContent = lives;
+                    obstacles.splice(index, 1);
+                    
+                    if (lives <= 0) {
+                        gameOver();
+                    }
+                }
+                
+                // Remove off-screen obstacles
+                if (obstacle.x < -obstacle.width) {
+                    obstacles.splice(index, 1);
+                }
+            });
+        }
+        
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Game Over!', canvas.width/2, canvas.height/2 - 70);
+            ctx.fillText(`Rings: ${ringCount}`, canvas.width/2, canvas.height/2 - 30);
+            ctx.font = '16px Arial';
+            ctx.fillText('Press SPACE to revive or R to restart', canvas.width/2, canvas.height/2 + 20);
+        }
+        
+        function revive() {
+            lives = 1;
+            player.x = 50;
+            player.y = canvas.height / 2;
+            obstacles = [];
+            gameRunning = true;
+            livesElement.textContent = lives;
+        }
+        
+        // Draw everything
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawRings();
+            drawObstacles();
+            drawPlayer();
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (gameRunning) {
+                updatePlayer();
+                updateRings();
+                updateObstacles();
+                
+                // Create new rings and obstacles
+                if (Math.random() < 0.02) {
+                    createRing();
+                }
+                if (Math.random() < 0.01) {
+                    createObstacle();
+                }
+            }
+            
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            
+            if (e.code === 'Space' && !gameRunning) {
+                revive();
+            }
+            if (e.code === 'KeyR' && !gameRunning) {
+                location.reload();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
+        
+        // Start game
+        createRing();
+        gameLoop();
+    </script>
+</body>
+</html>

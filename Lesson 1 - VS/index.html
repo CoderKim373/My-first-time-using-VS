@@ -510,9 +510,11 @@
                     <li><a href="tails.html">Tails</a></li>
                     <li><a href="knuckles.html">Knuckles</a></li>
                     <li><a href="shadow.html">Shadow</a></li>
-                    <li><a href="games.html">Games</a></li>
+                    <li><a href="arcade.html">Games</a></li>
+                    <li><a href="games.html">Sonic Games</a></li>
                     <li><a href="movies.html">Sonic Movies</a></li>
                     <li><a href="quiz.html">Trivia Quiz</a></li>
+                    <li><a href="login.html" id="authLink">Login</a></li>
                     <li><a href="#comments">Comments</a></li>
                 </ul>
                 <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
@@ -580,10 +582,10 @@
         </footer>
     </div>
 
-    <!-- Tailer Chatbot -->
-    <div id="tailer-chatbot" title="Chat with Tailer">T</div>
+    <!-- Miles AI Assistant -->
+    <div id="tailer-chatbot" title="Chat with Miles">M</div>
     <div id="tailer-window">
-        <div id="tailer-header">Tailer AI Chatbot</div>
+        <div id="tailer-header">Miles - Your Sonic Guide</div>
         <div id="tailer-messages"></div>
         <div id="tailer-input-container">
             <input type="text" id="tailer-input" placeholder="Type your message..." />
@@ -609,13 +611,21 @@
             }
         }
         
-        // Load saved theme
+        // Load saved theme and check login
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
             const themeBtn = document.querySelector('.theme-toggle');
             if (savedTheme === 'dark') {
                 document.body.setAttribute('data-theme', 'dark');
                 themeBtn.textContent = '☀️';
+            }
+            
+            // Update auth link based on login status
+            const user = JSON.parse(localStorage.getItem('sonicUser') || '{}');
+            const authLink = document.getElementById('authLink');
+            if (user.loggedIn) {
+                authLink.textContent = 'My Account';
+                authLink.href = 'account.html';
             }
         });
         
@@ -751,7 +761,7 @@
         function getBotResponse(message) {
             const lowerMsg = message.toLowerCase();
             if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
-                return 'Hello! I am Tailer, your Sonic Team assistant. How can I help you today?';
+                return 'Hey there! I\'m Miles, your friendly Sonic Team guide! Just like Tails, I\'m here to help you navigate everything Sonic. What would you like to know?';
             } else if (lowerMsg.includes('sonic')) {
                 return 'Sonic is the main protagonist, known for his incredible speed!';
             } else if (lowerMsg.includes('tails')) {
@@ -763,7 +773,7 @@
             } else if (lowerMsg.includes('movie')) {
                 return 'Check out our Sonic Movies page for info about all the films!';
             } else {
-                return 'Sorry, I am still learning. Ask me about Sonic, Tails, Knuckles, Shadow, or the movies!';
+                return 'Hmm, that\'s a tough one! I\'m still learning all the Sonic lore. Try asking me about our heroes - Sonic, Tails, Knuckles, Shadow, or check out the movies and games!';
             }
         }
 

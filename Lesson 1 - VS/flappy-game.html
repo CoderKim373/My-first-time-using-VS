@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonic Flappy - The Sonic Team</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('https://wallpaperaccess.com/full/1086060.jpg') center/cover no-repeat fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-container {
+            text-align: center;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        canvas {
+            border: 3px solid #333;
+            border-radius: 10px;
+            background: url('https://i.pinimg.com/1200x/2d/19/1e/2d191e8631ce581a0d584a2d861501bd.jpg') center/cover no-repeat;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.2);
+        }
+        
+        .controls {
+            margin: 15px 0;
+            color: #333;
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff9800;
+            margin: 10px 0;
+        }
+        
+        .back-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .back-btn:hover {
+            background: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>⚡ Sonic Flappy</h1>
+        <div class="score">Score: <span id="score">0</span></div>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+        <div class="controls">
+            <p>Press SPACE or click to jump!</p>
+            <p>Playing as: <strong id="character"></strong></p>
+        </div>
+        <button class="back-btn" onclick="window.location.href='arcade.html'">← Back to Arcade</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const characterElement = document.getElementById('character');
+        
+        // Get selected character
+        const character = localStorage.getItem('selectedCharacter') || 'sonic';
+        characterElement.textContent = character.toUpperCase();
+        
+        // Character colors
+        const colors = {
+            sonic: '#0066ff',
+            tails: '#ff9900',
+            knuckles: '#ff0000',
+            shadow: '#333333'
+        };
+        
+        // Game variables
+        let bird = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 50,
+            height: 50,
+            velocity: 0,
+            gravity: 0.5,
+            jump: -10
+        };
+        
+        let pipes = [];
+        let score = 0;
+        let gameRunning = true;
+        let pipeWidth = 60;
+        let pipeGap = 150;
+        
+        // Create pipes
+        function createPipe() {
+            const pipeHeight = Math.random() * (canvas.height - pipeGap - 100) + 50;
+            pipes.push({
+                x: canvas.width,
+                topHeight: pipeHeight,
+                bottomY: pipeHeight + pipeGap,
+                bottomHeight: canvas.height - (pipeHeight + pipeGap),
+                passed: false
+            });
+        }
+        
+        // Character images
+        const characterImages = {
+            sonic: 'https://i.pinimg.com/736x/d0/99/ef/d099ef42e201aecf8fe0c80a9794c482.jpg',
+            tails: 'https://i.pinimg.com/736x/9a/b0/7c/9ab07c52c48cf956abbba65bbf11e138.jpg',
+            knuckles: 'https://i.pinimg.com/736x/49/65/58/496558595c344aca8692a493b2840d1a.jpg',
+            shadow: 'https://i.pinimg.com/736x/d0/d5/f9/d0d5f9fb8be66f1682bb67978c08711b.jpg'
+        };
+        
+        let characterImg = new Image();
+        characterImg.src = characterImages[character];
+        
+        // Draw bird
+        function drawBird() {
+            if (characterImg.complete) {
+                ctx.drawImage(characterImg, bird.x, bird.y, bird.width, bird.height);
+            } else {
+                // Fallback circle
+                ctx.fillStyle = colors[character];
+                ctx.beginPath();
+                ctx.arc(bird.x + bird.width/2, bird.y + bird.height/2, bird.width/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Draw pipes
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                // Pipe gradient for 3D effect
+                const pipeGradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + pipeWidth, 0);
+                pipeGradient.addColorStop(0, '#2E7D32');
+                pipeGradient.addColorStop(0.3, '#4CAF50');
+                pipeGradient.addColorStop(0.7, '#66BB6A');
+                pipeGradient.addColorStop(1, '#1B5E20');
+                ctx.fillStyle = pipeGradient;
+                
+                // Top pipe with shadow
+                ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topHeight);
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(pipe.x + pipeWidth - 5, 0, 5, pipe.topHeight);
+                
+                // Bottom pipe with shadow
+                ctx.fillStyle = pipeGradient;
+                ctx.fillRect(pipe.x, pipe.bottomY, pipeWidth, pipe.bottomHeight);
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(pipe.x + pipeWidth - 5, pipe.bottomY, 5, pipe.bottomHeight);
+                
+                // Pipe caps
+                ctx.fillStyle = '#388E3C';
+                ctx.fillRect(pipe.x - 5, pipe.topHeight - 20, pipeWidth + 10, 20);
+                ctx.fillRect(pipe.x - 5, pipe.bottomY, pipeWidth + 10, 20);
+            });
+        }
+        
+        // Update game
+        function update() {
+            if (!gameRunning) return;
+            
+            // Update bird
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+            
+            // Update pipes
+            pipes.forEach((pipe, index) => {
+                pipe.x -= 3;
+                
+                // Check if pipe passed
+                if (!pipe.passed && pipe.x + pipeWidth < bird.x) {
+                    pipe.passed = true;
+                    score++;
+                    scoreElement.textContent = score;
+                }
+                
+                // Remove off-screen pipes
+                if (pipe.x + pipeWidth < 0) {
+                    pipes.splice(index, 1);
+                }
+            });
+            
+            // Create new pipes
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
+                createPipe();
+            }
+            
+            // Check collisions
+            checkCollisions();
+        }
+        
+        // Check collisions
+        function checkCollisions() {
+            // Ground and ceiling
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                gameOver();
+            }
+            
+            // Pipes
+            pipes.forEach(pipe => {
+                if (bird.x < pipe.x + pipeWidth && 
+                    bird.x + bird.width > pipe.x) {
+                    if (bird.y < pipe.topHeight || 
+                        bird.y + bird.height > pipe.bottomY) {
+                        gameOver();
+                    }
+                }
+            });
+        }
+        
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Game Over!', canvas.width/2, canvas.height/2 - 70);
+            ctx.fillText(`Score: ${score}`, canvas.width/2, canvas.height/2 - 30);
+            ctx.font = '16px Arial';
+            ctx.fillText('Press SPACE to revive or R to restart', canvas.width/2, canvas.height/2 + 20);
+        }
+        
+        function revive() {
+            bird.y = canvas.height / 2;
+            bird.velocity = 0;
+            gameRunning = true;
+        }
+        
+        // Draw everything
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawPipes();
+            drawBird();
+        }
+        
+        function drawCloud(x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.arc(x + 25, y, 25, 0, Math.PI * 2);
+            ctx.arc(x + 50, y, 20, 0, Math.PI * 2);
+            ctx.arc(x + 15, y - 15, 15, 0, Math.PI * 2);
+            ctx.arc(x + 35, y - 15, 15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Game loop
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Controls
+        function jump() {
+            if (gameRunning) {
+                bird.velocity = bird.jump;
+            }
+        }
+        
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (gameRunning) {
+                    jump();
+                } else {
+                    revive();
+                }
+            }
+            if (e.code === 'KeyR' && !gameRunning) {
+                location.reload();
+            }
+        });
+        
+        canvas.addEventListener('click', jump);
+        
+        // Start game
+        createPipe();
+        gameLoop();
+    </script>
+</body>
+</html>
